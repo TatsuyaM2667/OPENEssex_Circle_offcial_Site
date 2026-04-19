@@ -1,19 +1,15 @@
-import reactLogo from '../assets/react.svg'
-import viteLogo from '../assets/vite.svg'
-import heroImg from '../assets/hero.png'
+import { Link } from 'react-router-dom';
 
 export default function Home() {
   return (
     <>
       <section id="center">
         <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+          <div className="brand-logo-placeholder">OE</div>
         </div>
         <div>
           <h1>Welcome to Open Essex</h1>
-          <p>A community for sharing knowledge and resources.</p>
+          <p>The exclusive platform for knowledge sharing and community growth.</p>
         </div>
       </section>
 
@@ -23,10 +19,10 @@ export default function Home() {
         <div id="docs">
           <h2>Member Sections</h2>
           <p>Explore our exclusive content</p>
-          <ul>
-            <li>Check out the latest Documents.</li>
-            <li>Follow our helpful Guides.</li>
-            <li>Find your next read in Books.</li>
+          <ul className="member-nav-links">
+            <li><Link to="/documents" className="link-button">Document Portal</Link></li>
+            <li><Link to="/guides" className="link-button">Expert Guides</Link></li>
+            <li><Link to="/books" className="link-button">Book Club</Link></li>
           </ul>
         </div>
       </section>

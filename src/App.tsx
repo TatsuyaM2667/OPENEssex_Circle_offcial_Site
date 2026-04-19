@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Documents from './pages/Documents';
@@ -6,16 +7,39 @@ import Guides from './pages/Guides';
 import Books from './pages/Books';
 import './App.css';
 
+function ProtectedRoute({ children, isLoggedIn }: { children: React.ReactNode, isLoggedIn: boolean }) {
+  if (!isLoggedIn) {
+    return (
+      <div className="page-container" style={{ textAlign: 'center' }}>
+        <h2>Members Only</h2>
+        <p>Please log in to access this section.</p>
+      </div>
+    );
+  }
+  return <>{children}</>;
+}
+
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   return (
     <Router>
-      <Navbar />
+      <Navbar isLoggedIn={isLoggedIn} onLoginToggle={() => setIsLoggedIn(!isLoggedIn)} />
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/documents" element={<Documents />} />
-          <Route path="/guides" element={<Guides />} />
-          <Route path="/books" element={<Books />} />
+          <Route 
+            path="/documents" 
+            element={<ProtectedRoute isLoggedIn={isLoggedIn}><Documents /></ProtectedRoute>} 
+          />
+          <Route 
+            path="/guides" 
+            element={<ProtectedRoute isLoggedIn={isLoggedIn}><Guides /></ProtectedRoute>} 
+          />
+          <Route 
+            path="/books" 
+            element={<ProtectedRoute isLoggedIn={isLoggedIn}><Books /></ProtectedRoute>} 
+          />
         </Routes>
       </main>
       <div className="ticks"></div>
