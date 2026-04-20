@@ -2,6 +2,7 @@
   --text: #4a4a4a;
   --text-h: #b02e40; /* Brand Red for headings */
   --bg: #fffdfa; /* Slightly yellowish white */
+  background-color: #f0f0f0; /* 背景が白すぎないか確認 */
   --border: #f3811f; /* Brand Orange for borders */
   --code-bg: #fff5eb;
   --accent: #f3811f; /* Brand Orange */
