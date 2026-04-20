@@ -29,6 +29,12 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      console.warn("Auth is not initialized. Skipping auth listener.");
+      setIsLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setIsLoading(false);
@@ -65,4 +71,3 @@ function App() {
 }
 
 export default App;
-

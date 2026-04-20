@@ -1,5 +1,5 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { initializeApp, type FirebaseApp } from 'firebase/app';
+import { getAuth, GoogleAuthProvider, type Auth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -10,13 +10,21 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase only if API key is present
-if (!firebaseConfig.apiKey || firebaseConfig.apiKey === 'your_api_key_here') {
-  console.warn("Firebase API Key is missing or default. Auth features will not work.");
+let app: FirebaseApp | undefined;
+let auth: Auth | undefined;
+
+const isConfigValid = firebaseConfig.apiKey && firebaseConfig.apiKey !== 'your_api_key_here';
+
+if (isConfigValid) {
+  try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+  } catch (error) {
+    console.error("Firebase initialization failed:", error);
+  }
+} else {
+  console.warn("Firebase configuration is missing or invalid. Auth will be disabled.");
 }
 
-const app = initializeApp(firebaseConfig);
-
-// Initialize Firebase Auth
-export const auth = getAuth(app);
+export { auth };
 export const googleProvider = new GoogleAuthProvider();

@@ -8,6 +8,10 @@ interface NavbarProps {
 
 export default function Navbar({ user }: NavbarProps) {
   const handleLogin = async () => {
+    if (!auth) {
+      alert("Firebaseの設定が完了していないため、ログイン機能は利用できません。");
+      return;
+    }
     try {
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
@@ -17,6 +21,7 @@ export default function Navbar({ user }: NavbarProps) {
   };
 
   const handleLogout = async () => {
+    if (!auth) return;
     try {
       await signOut(auth);
     } catch (error) {
@@ -57,7 +62,7 @@ export default function Navbar({ user }: NavbarProps) {
             </div>
           ) : (
             <button onClick={handleLogin} className="login-button">
-              メンバーログイン
+              {auth ? "メンバーログイン" : "ログイン無効"}
             </button>
           )}
         </li>
