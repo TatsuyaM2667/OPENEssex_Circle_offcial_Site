@@ -111,7 +111,7 @@ export default function Guides() {
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{guide.content}</ReactMarkdown>
             </div>
             
-            <div style={{ display: 'flex', gap: '10px', marginTop: '1rem', borderTop: '1px solid rgba(0,0,0,0.1)', paddingTop: '1rem' }}>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '1rem', borderTop: '1px solid rgba(0,0,0,0.1)', paddingTop: '1rem' }}>
               <button className="login-button" onClick={() => handleLike(guide.id)} style={{ padding: '0.4rem 1rem', fontSize: '0.9rem', background: 'var(--brand-red)' }}>
                 ♥ いいね ({guide.likes || 0})
               </button>
