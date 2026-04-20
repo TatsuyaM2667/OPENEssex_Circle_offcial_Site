@@ -5,4 +5,4 @@ pages_build_output_dir = "dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "open-essex-db"
-database_id = "your_d1_database_id_here"
+database_id = "73117cdd-8f7e-47b7-8d5b-75f998e044de"
