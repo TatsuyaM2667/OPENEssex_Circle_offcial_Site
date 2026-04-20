@@ -9,6 +9,16 @@ import Guides from './pages/Guides';
 import Books from './pages/Books';
 import './App.css';
 
+// エラー境界用の簡易コンポーネント
+function ErrorBoundary({ children }: { children: React.ReactNode }) {
+  try {
+    return <>{children}</>;
+  } catch (error) {
+    console.error("Rendering error:", error);
+    return <div>表示エラーが発生しました。</div>;
+  }
+}
+
 function ProtectedRoute({ children, isLoggedIn, isLoading }: { children: React.ReactNode, isLoggedIn: boolean, isLoading: boolean }) {
   if (isLoading) {
     return <div className="page-container" style={{ textAlign: 'center' }}><p>読み込み中...</p></div>;
@@ -30,11 +40,9 @@ function App() {
 
   useEffect(() => {
     if (!auth) {
-      console.warn("Auth is not initialized. Skipping auth listener.");
       setIsLoading(false);
       return;
     }
-
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setIsLoading(false);
@@ -42,27 +50,18 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  const isLoggedIn = !!user;
-
   return (
     <Router>
       <Navbar user={user} />
       <main>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route 
-            path="/documents" 
-            element={<ProtectedRoute isLoggedIn={isLoggedIn} isLoading={isLoading}><Documents /></ProtectedRoute>} 
-          />
-          <Route 
-            path="/guides" 
-            element={<ProtectedRoute isLoggedIn={isLoggedIn} isLoading={isLoading}><Guides /></ProtectedRoute>} 
-          />
-          <Route 
-            path="/books" 
-            element={<ProtectedRoute isLoggedIn={isLoggedIn} isLoading={isLoading}><Books /></ProtectedRoute>} 
-          />
-        </Routes>
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/documents" element={<ProtectedRoute isLoggedIn={!!user} isLoading={isLoading}><Documents /></ProtectedRoute>} />
+            <Route path="/guides" element={<ProtectedRoute isLoggedIn={!!user} isLoading={isLoading}><Guides /></ProtectedRoute>} />
+            <Route path="/books" element={<ProtectedRoute isLoggedIn={!!user} isLoading={isLoading}><Books /></ProtectedRoute>} />
+          </Routes>
+        </ErrorBoundary>
       </main>
       <div className="ticks"></div>
       <section id="spacer"></section>
