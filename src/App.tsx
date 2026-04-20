@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import { auth } from './firebase';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Documents from './pages/Documents';
@@ -7,7 +9,10 @@ import Guides from './pages/Guides';
 import Books from './pages/Books';
 import './App.css';
 
-function ProtectedRoute({ children, isLoggedIn }: { children: React.ReactNode, isLoggedIn: boolean }) {
+function ProtectedRoute({ children, isLoggedIn, isLoading }: { children: React.ReactNode, isLoggedIn: boolean, isLoading: boolean }) {
+  if (isLoading) {
+    return <div className="page-container" style={{ textAlign: 'center' }}><p>読み込み中...</p></div>;
+  }
   if (!isLoggedIn) {
     return (
       <div className="page-container" style={{ textAlign: 'center' }}>
@@ -20,25 +25,36 @@ function ProtectedRoute({ children, isLoggedIn }: { children: React.ReactNode, i
 }
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setIsLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const isLoggedIn = !!user;
 
   return (
     <Router>
-      <Navbar isLoggedIn={isLoggedIn} onLoginToggle={() => setIsLoggedIn(!isLoggedIn)} />
+      <Navbar user={user} />
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route 
             path="/documents" 
-            element={<ProtectedRoute isLoggedIn={isLoggedIn}><Documents /></ProtectedRoute>} 
+            element={<ProtectedRoute isLoggedIn={isLoggedIn} isLoading={isLoading}><Documents /></ProtectedRoute>} 
           />
           <Route 
             path="/guides" 
-            element={<ProtectedRoute isLoggedIn={isLoggedIn}><Guides /></ProtectedRoute>} 
+            element={<ProtectedRoute isLoggedIn={isLoggedIn} isLoading={isLoading}><Guides /></ProtectedRoute>} 
           />
           <Route 
             path="/books" 
-            element={<ProtectedRoute isLoggedIn={isLoggedIn}><Books /></ProtectedRoute>} 
+            element={<ProtectedRoute isLoggedIn={isLoggedIn} isLoading={isLoading}><Books /></ProtectedRoute>} 
           />
         </Routes>
       </main>
@@ -49,3 +65,4 @@ function App() {
 }
 
 export default App;
+
