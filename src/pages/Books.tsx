@@ -92,21 +92,23 @@ export default function Books() {
   return (
     <div className="page-container">
       <h1>おすすめ本</h1>
+      <p className="page-subtitle">メンバーが推薦する名著と必読書</p>
+      
       <button onClick={() => {
         setShowForm(!showForm);
         if (editId) { setEditId(null); setTitle(''); setAuthor(''); setDescription(''); setLink(''); }
-      }} className="login-button" style={{ marginBottom: '2rem' }}>
+      }} className="btn btn-primary" style={{ marginBottom: '2rem' }}>
         {showForm ? 'キャンセル' : '本を推薦する'}
       </button>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="post-form">
-          <input type="text" placeholder="本のタイトル" value={title} onChange={e => setTitle(e.target.value)} required />
-          {!editId && <input type="text" placeholder="著者" value={author} onChange={e => setAuthor(e.target.value)} required />}
-          <textarea placeholder="推薦理由・説明（Markdown対応）" value={description} onChange={e => setDescription(e.target.value)} required rows={8} />
-          {!editId && <input type="url" placeholder="関連リンク (URL)" value={link} onChange={e => setLink(e.target.value)} />}
-          <p style={{ fontSize: '0.8rem', margin: '-0.5rem 0' }}>※Markdown記法が使えます</p>
-          <button type="submit" disabled={isSubmitting}>
+        <form onSubmit={handleSubmit} className="post-form glass-panel">
+          <input type="text" placeholder="本のタイトル" value={title} onChange={e => setTitle(e.target.value)} required className="input-field" />
+          {!editId && <input type="text" placeholder="著者" value={author} onChange={e => setAuthor(e.target.value)} required className="input-field" />}
+          <textarea placeholder="推薦理由・説明（Markdown対応）" value={description} onChange={e => setDescription(e.target.value)} required rows={8} className="input-field" />
+          {!editId && <input type="url" placeholder="関連リンク (URL)" value={link} onChange={e => setLink(e.target.value)} className="input-field" />}
+          <p style={{ fontSize: '0.8rem', margin: '-0.5rem 0 1rem', color: 'var(--text-muted)' }}>※Markdown記法が使えます</p>
+          <button type="submit" disabled={isSubmitting} className="btn btn-primary">
             {isSubmitting ? '処理中...' : editId ? '変更を保存' : '推薦を投稿する'}
           </button>
         </form>
@@ -114,7 +116,7 @@ export default function Books() {
 
       <div className="list-container">
         {books.length === 0 ? <p>推薦された本はまだありません。</p> : books.map(book => (
-          <div key={book.id} className="card">
+          <div key={book.id} className="card glass-panel">
             <h2>{book.title}</h2>
             <p className="meta">著者: {book.author}</p>
             <div className="content" style={{ padding: '1rem 0', marginBottom: '1rem' }}>
@@ -122,18 +124,18 @@ export default function Books() {
             </div>
             
             {book.link && (
-              <a href={book.link} target="_blank" rel="noopener noreferrer" className="link-button" style={{ display: 'inline-block', fontSize: '0.9rem', padding: '0.4rem 1rem' }}>
-                詳細を見る
+              <a href={book.link} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ display: 'inline-flex', fontSize: '0.9rem', padding: '0.6rem 1.2rem', marginBottom: '1rem' }}>
+                詳細を見る 🔗
               </a>
             )}
 
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '1.5rem', borderTop: '1px solid rgba(0,0,0,0.1)', paddingTop: '1rem' }}>
-              <button className="login-button" onClick={() => handleLike(book.id)} style={{ padding: '0.4rem 1rem', fontSize: '0.9rem', background: 'var(--brand-red)' }}>
-                ♥ いいね ({book.likes || 0})
+            <div className="timeline-actions">
+              <button className="btn btn-like" onClick={() => handleLike(book.id)}>
+                <span className="icon">♥</span> {book.likes || 0}
               </button>
-              <div style={{ flex: 1 }}></div>
-              <button className="login-button" onClick={() => handleEdit(book)} style={{ padding: '0.4rem 1rem', fontSize: '0.9rem', background: '#555' }}>編集</button>
-              <button className="login-button" onClick={() => handleDelete(book.id)} style={{ padding: '0.4rem 1rem', fontSize: '0.9rem', background: '#dc3545' }}>削除</button>
+              <div className="spacer"></div>
+              <button className="btn btn-edit" onClick={() => handleEdit(book)}>編集</button>
+              <button className="btn btn-delete" onClick={() => handleDelete(book.id)}>削除</button>
             </div>
           </div>
         ))}

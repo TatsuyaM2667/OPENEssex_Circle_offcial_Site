@@ -3,10 +3,12 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from './firebase';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Home from './pages/Home';
 import Documents from './pages/Documents';
 import Guides from './pages/Guides';
 import Books from './pages/Books';
+import Timeline from './pages/Timeline';
 import './App.css';
 
 // エラー境界用の簡易コンポーネント
@@ -50,13 +52,14 @@ function App() {
             <Route path="/documents" element={<ProtectedRoute isLoggedIn={!!user} isLoading={isLoading}><Documents /></ProtectedRoute>} />
             <Route path="/guides" element={<ProtectedRoute isLoggedIn={!!user} isLoading={isLoading}><Guides /></ProtectedRoute>} />
             <Route path="/books" element={<ProtectedRoute isLoggedIn={!!user} isLoading={isLoading}><Books /></ProtectedRoute>} />
+            <Route path="/timeline" element={<ProtectedRoute isLoggedIn={!!user} isLoading={isLoading}><Timeline /></ProtectedRoute>} />
           </Routes>
         </ErrorBoundary>
       </main>
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+      <Footer />
     </Router>
   );
 }
 
 export default App;
+

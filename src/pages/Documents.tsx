@@ -89,20 +89,24 @@ export default function Documents() {
   return (
     <div className="page-container">
       <h1>課題・資料</h1>
+      <p className="page-subtitle">課題や公開資料の共有ポータル</p>
+      
       <button onClick={() => {
         setShowForm(!showForm);
         if (editId) { setEditId(null); setTitle(''); setContent(''); setAuthor(''); }
-      }} className="login-button" style={{ marginBottom: '2rem' }}>
+      }} className="btn btn-primary" style={{ marginBottom: '2rem' }}>
         {showForm ? 'キャンセル' : '新規投稿'}
       </button>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="post-form">
-          <input type="text" placeholder="タイトル" value={title} onChange={e => setTitle(e.target.value)} required />
-          {!editId && <input type="text" placeholder="投稿者名" value={author} onChange={e => setAuthor(e.target.value)} required />}
-          <textarea placeholder="内容・説明（Markdown対応）" value={content} onChange={e => setContent(e.target.value)} required rows={10} />
-          <p style={{ fontSize: '0.8rem', marginTop: '-0.5rem' }}>※Markdown記法（# 見出し, * リスト, **太字** など）が使えます</p>
-          <button type="submit" disabled={isSubmitting}>
+        <form onSubmit={handleSubmit} className="post-form glass-panel">
+          <div className="form-group row">
+            <input type="text" placeholder="タイトル" value={title} onChange={e => setTitle(e.target.value)} required className="input-field" />
+            {!editId && <input type="text" placeholder="投稿者名" value={author} onChange={e => setAuthor(e.target.value)} required className="input-field" />}
+          </div>
+          <textarea placeholder="内容・説明（Markdown対応）" value={content} onChange={e => setContent(e.target.value)} required rows={10} className="input-field" />
+          <p style={{ fontSize: '0.8rem', marginTop: '-0.5rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>※Markdown記法（# 見出し, * リスト, **太字** など）が使えます</p>
+          <button type="submit" disabled={isSubmitting} className="btn btn-primary">
             {isSubmitting ? '処理中...' : editId ? '変更を保存' : '投稿する'}
           </button>
         </form>
@@ -110,7 +114,7 @@ export default function Documents() {
 
       <div className="list-container">
         {documents.length === 0 ? <p>投稿はまだありません。</p> : documents.map(doc => (
-          <div key={doc.id} className="card">
+          <div key={doc.id} className="card glass-panel">
             <h2>{doc.title}</h2>
             <p className="meta">
               {doc.author} · {new Date(doc.created_at).toLocaleDateString('ja-JP')}
@@ -119,13 +123,13 @@ export default function Documents() {
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{doc.content}</ReactMarkdown>
             </div>
             
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '1rem', borderTop: '1px solid rgba(0,0,0,0.1)', paddingTop: '1rem' }}>
-              <button className="login-button" onClick={() => handleLike(doc.id)} style={{ padding: '0.4rem 1rem', fontSize: '0.9rem', background: 'var(--brand-red)' }}>
-                ♥ いいね ({doc.likes || 0})
+            <div className="timeline-actions">
+              <button className="btn btn-like" onClick={() => handleLike(doc.id)}>
+                <span className="icon">♥</span> {doc.likes || 0}
               </button>
-              <div style={{ flex: 1 }}></div>
-              <button className="login-button" onClick={() => handleEdit(doc)} style={{ padding: '0.4rem 1rem', fontSize: '0.9rem', background: '#555' }}>編集</button>
-              <button className="login-button" onClick={() => handleDelete(doc.id)} style={{ padding: '0.4rem 1rem', fontSize: '0.9rem', background: '#dc3545' }}>削除</button>
+              <div className="spacer"></div>
+              <button className="btn btn-edit" onClick={() => handleEdit(doc)}>編集</button>
+              <button className="btn btn-delete" onClick={() => handleDelete(doc.id)}>削除</button>
             </div>
           </div>
         ))}
