@@ -1,26 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --text: #2c1a1d;
-  --text-h: #1a0b0e;
-  --text-muted: #7b6366;
-  --brand-red: #d92543;
-  --brand-orange: #ff6b35;
+  --text: #f0e6e6;
+  --text-h: #ffffff;
+  --text-muted: #a69194;
+  
+  --brand-red: #ff4766;
+  --brand-orange: #ff8e52;
   --brand-gradient: linear-gradient(135deg, var(--brand-red) 0%, var(--brand-orange) 100%);
   
-  --bg-gradient: linear-gradient(135deg, #fffafa 0%, #ffece6 100%);
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.6);
-  --glass-shadow: 0 10px 40px -10px rgba(217, 37, 67, 0.15);
+  --bg-gradient: radial-gradient(circle at 15% 50%, #290a10, #130406 100%);
+  --glass-bg: rgba(30, 8, 12, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
   
-  --card-bg: rgba(255, 255, 255, 0.85);
-  --code-bg: rgba(217, 37, 67, 0.05);
+  --card-bg: rgba(45, 15, 20, 0.6);
+  --code-bg: rgba(0, 0, 0, 0.4);
   
   --sans: 'Outfit', system-ui, -apple-system, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
   font: 16px/1.6 var(--sans);
-  color-scheme: light;
+  color-scheme: dark;
   color: var(--text);
   background: var(--bg-gradient);
   background-attachment: fixed;
@@ -30,22 +31,23 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
-    --text: #f0e6e6;
-    --text-h: #ffffff;
-    --text-muted: #a69194;
+    --text: #2c1a1d;
+    --text-h: #1a0b0e;
+    --text-muted: #7b6366;
     
-    --brand-red: #ff4766;
-    --brand-orange: #ff8e52;
+    --brand-red: #d92543;
+    --brand-orange: #ff6b35;
     
-    --bg-gradient: radial-gradient(circle at 15% 50%, #290a10, #130406 100%);
-    --glass-bg: rgba(30, 8, 12, 0.5);
-    --glass-border: rgba(255, 255, 255, 0.05);
-    --glass-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
+    --bg-gradient: linear-gradient(135deg, #fffafa 0%, #ffece6 100%);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --glass-shadow: 0 10px 40px -10px rgba(217, 37, 67, 0.15);
     
-    --card-bg: rgba(45, 15, 20, 0.6);
-    --code-bg: rgba(0, 0, 0, 0.4);
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --code-bg: rgba(217, 37, 67, 0.05);
+    color-scheme: light;
   }
 }
 
@@ -53,6 +55,106 @@ body {
   margin: 0;
   min-height: 100svh;
   overflow-x: hidden;
+}
+
+/* Navbar styles */
+.navbar {
+  margin: 1rem auto;
+  padding: 1rem 2rem;
+  border-radius: 100px;
+  width: calc(100% - 40px);
+  max-width: 1200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  position: sticky;
+  top: 1rem;
+  z-index: 1000;
+}
+.navbar-brand a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text-h);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+.navbar-logo {
+  height: 40px; 
+  width: 40px; 
+  border-radius: 50%; 
+  object-fit: cover; 
+  object-position: center 15%;
+  border: 2px solid var(--brand-red);
+}
+.navbar-scroll-area {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+.navbar-links {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+.navbar-links a {
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 600;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+.navbar-links a:hover {
+  color: var(--brand-red);
+}
+.navbar-auth {
+  display: flex;
+  align-items: center;
+}
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.user-profile img {
+  width: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--brand-orange);
+}
+.outline-btn {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  background-color: transparent;
+  border: 1px solid var(--glass-border);
+  color: var(--text);
+}
+.outline-btn:hover {
+  background-color: rgba(255,255,255,0.1);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0.8rem 1rem;
+    width: calc(100% - 20px);
+    border-radius: 20px; /* More squarish pill on mobile */
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .navbar-scroll-area {
+    order: 3; /* Move links to bottom row */
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  .navbar-links {
+    gap: 1rem;
+  }
 }
 
 #root {
