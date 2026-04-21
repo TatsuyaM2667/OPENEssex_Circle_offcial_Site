@@ -9,26 +9,25 @@ interface NavbarProps {
 
 export default function Navbar({ user }: NavbarProps) {
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
       // モバイル画面（768px以下）のみスクロール判定
       if (window.innerWidth <= 768) {
-        if (window.scrollY > lastScrollY && window.scrollY > 80) {
-          setIsVisible(false); // 下スクロールで隠蔽
+        // 一番上（スクロール量が50px以下）に到達した時のみ表示し、それ以外は隠す
+        if (window.scrollY > 50) {
+          setIsVisible(false); // 少しでもスクロールしたら隠す
         } else {
-          setIsVisible(true);  // 上スクロールで表示
+          setIsVisible(true);  // 一番上に到達したら表示
         }
       } else {
         setIsVisible(true); // PC時は常に表示
       }
-      setLastScrollY(window.scrollY);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   const handleLogin = async () => {
     if (!auth) {
