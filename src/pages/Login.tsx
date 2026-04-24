@@ -31,7 +31,7 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     setError('');
     try {
-      await signInWithPopup(auth, googleProvider);
+      await signInWithPopup(auth!, googleProvider);
       navigate('/');
     } catch (err: any) {
       setError(err.message || 'Googleログインに失敗しました。');
@@ -51,12 +51,12 @@ export default function Login() {
           setIsSubmitting(false);
           return;
         }
-        const credential = await createUserWithEmailAndPassword(auth, email, password);
+        const credential = await createUserWithEmailAndPassword(auth!, email, password);
         if (displayName && credential.user) {
           await updateProfile(credential.user, { displayName });
         }
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
+        await signInWithEmailAndPassword(auth!, email, password);
       }
       navigate('/');
     } catch (err: any) {
