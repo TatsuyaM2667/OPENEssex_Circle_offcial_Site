@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from './firebase';
 import Navbar from './components/Navbar';
@@ -10,6 +10,7 @@ import Guides from './pages/Guides';
 import Books from './pages/Books';
 import Timeline from './pages/Timeline';
 import Projects from './pages/Projects';
+import Login from './pages/Login';
 import './App.css';
 
 // エラー境界用の簡易コンポーネント
@@ -24,14 +25,7 @@ function ErrorBoundary({ children }: { children: React.ReactNode }) {
 
 function ProtectedRoute({ children, isLoggedIn, isLoading }: { children: React.ReactNode, isLoggedIn: boolean, isLoading: boolean }) {
   if (isLoading) return <div className="page-container"><p>認証状態を確認中...</p></div>;
-  if (!isLoggedIn) return (
-    <div className="page-container" style={{ textAlign: 'center', marginTop: '4rem' }}>
-      <h2>ログインが必要です</h2>
-      <p style={{ marginTop: '1rem', color: 'var(--text-color)' }}>
-        このページを閲覧するには、右上の「ログイン」ボタンからGoogleアカウントでログインしてください。
-      </p>
-    </div>
-  );
+  if (!isLoggedIn) return <Navigate to="/login" replace />;
   return <>{children}</>;
 }
 
@@ -58,6 +52,7 @@ function App() {
         <ErrorBoundary>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
             <Route path="/documents" element={<ProtectedRoute isLoggedIn={!!user} isLoading={isLoading}><Documents /></ProtectedRoute>} />
             <Route path="/guides" element={<ProtectedRoute isLoggedIn={!!user} isLoading={isLoading}><Guides /></ProtectedRoute>} />
             <Route path="/books" element={<ProtectedRoute isLoggedIn={!!user} isLoading={isLoading}><Books /></ProtectedRoute>} />

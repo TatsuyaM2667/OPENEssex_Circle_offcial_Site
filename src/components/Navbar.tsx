@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { signInWithPopup, signOut, type User } from 'firebase/auth';
-import { auth, googleProvider } from '../firebase';
+import { signOut, type User } from 'firebase/auth';
+import { auth } from '../firebase';
 
 interface NavbarProps {
   user: User | null;
@@ -12,35 +12,20 @@ export default function Navbar({ user }: NavbarProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      // モバイル画面（768px以下）のみスクロール判定
       if (window.innerWidth <= 768) {
-        // 一番上（スクロール量が50px以下）に到達した時のみ表示し、それ以外は隠す
         if (window.scrollY > 50) {
-          setIsVisible(false); // 少しでもスクロールしたら隠す
+          setIsVisible(false);
         } else {
-          setIsVisible(true);  // 一番上に到達したら表示
+          setIsVisible(true);
         }
       } else {
-        setIsVisible(true); // PC時は常に表示
+        setIsVisible(true);
       }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const handleLogin = async () => {
-    if (!auth) {
-      alert("Firebaseの設定が完了していないため、ログイン機能は利用できません。");
-      return;
-    }
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (error) {
-      console.error("ログインエラー:", error);
-      alert("ログインに失敗しました。");
-    }
-  };
 
   const handleLogout = async () => {
     if (!auth) return;
@@ -76,14 +61,15 @@ export default function Navbar({ user }: NavbarProps) {
         {user ? (
           <div className="user-profile">
             {user.photoURL && <img src={user.photoURL} alt="User" />}
+            <span className="user-name">{user.displayName || user.email}</span>
             <button onClick={handleLogout} className="btn outline-btn">
               ログアウト
             </button>
           </div>
         ) : (
-          <button onClick={handleLogin} className="btn btn-primary">
-            {auth ? "ログイン" : "ログイン無効"}
-          </button>
+          <Link to="/login" className="btn btn-primary">
+            ログイン
+          </Link>
         )}
       </div>
     </nav>
