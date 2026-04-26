@@ -874,10 +874,9 @@ code {
   margin-top: 2rem;
 }
 .member-row {
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-  padding: 1rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+  padding: 0; /* padding moved to content */
   text-decoration: none;
   cursor: pointer;
   border-radius: 16px;
@@ -886,6 +885,34 @@ code {
 .member-row:hover {
   border-color: var(--brand-red);
   transform: translateX(6px);
+}
+.member-row-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('/OpenEssex.png');
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+  opacity: 0.5; /* image is visible but overlay dims it */
+  transition: opacity 0.3s ease;
+}
+.member-row:hover .member-row-bg {
+  opacity: 0.7;
+}
+.member-row-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, var(--glass-bg) 40%, rgba(13, 17, 24, 0.6) 100%);
+}
+.member-row-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1rem 1.5rem;
+  width: 100%;
 }
 .member-row-avatar {
   flex-shrink: 0;
@@ -932,6 +959,12 @@ code {
   background: rgba(217, 37, 67, 0.08);
   border-radius: 100px;
   white-space: nowrap;
+}
+.role-executive {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #111827;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.3);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
 }
 .member-row-bio {
   font-size: 0.85rem;
@@ -1228,7 +1261,7 @@ code {
 
 /* Responsive adjustments for new pages */
 @media (max-width: 768px) {
-  .member-row {
+  .member-row-content {
     flex-wrap: wrap;
     padding: 1rem;
   }
