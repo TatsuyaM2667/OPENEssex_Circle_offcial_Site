@@ -13,7 +13,7 @@ interface ProfileForm {
 }
 
 export default function MyPage() {
-  const { user } = useAuth();
+  const { user, updateLocalProfile } = useAuth();
   const [form, setForm] = useState<ProfileForm>({
     display_name: '',
     avatar_url: '',
@@ -84,6 +84,7 @@ export default function MyPage() {
       if (res.ok) {
         setMessage('プロフィールを保存しました！');
         setIsNew(false);
+        updateLocalProfile(form.display_name, form.avatar_url);
       } else {
         setMessage('保存に失敗しました。');
       }

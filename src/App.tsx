@@ -50,11 +50,9 @@ function AppRoutes() {
 }
 
 function AppContent() {
-  const { user } = useAuth();
-
   return (
     <Router>
-      <Navbar user={user} />
+      <Navbar />
       <main>
         <ErrorBoundary>
           <AppRoutes />

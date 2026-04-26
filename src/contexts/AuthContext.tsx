@@ -6,17 +6,23 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   userName: string;
+  userAvatar: string;
+  updateLocalProfile: (name: string, avatar: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
   userName: '',
+  userAvatar: '',
+  updateLocalProfile: () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [dbName, setDbName] = useState<string>('');
+  const [dbAvatar, setDbAvatar] = useState<string>('');
 
   useEffect(() => {
     if (!auth) {
@@ -27,39 +33,70 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(currentUser);
       setIsLoading(false);
 
-      // Auto-register profile on login (cached in localStorage to avoid repeated D1 reads)
       if (currentUser) {
+        // Load custom profile info from localStorage first for fast rendering
+        const cachedName = localStorage.getItem(`profile_name_${currentUser.uid}`);
+        const cachedAvatar = localStorage.getItem(`profile_avatar_${currentUser.uid}`);
+        if (cachedName) setDbName(cachedName);
+        if (cachedAvatar) setDbAvatar(cachedAvatar);
+
         const cacheKey = `profile_registered_${currentUser.uid}`;
-        if (!localStorage.getItem(cacheKey)) {
+        if (!localStorage.getItem(cacheKey) || !cachedName) {
           try {
             const res = await fetch(`/api/profiles/${currentUser.uid}`);
             if (!res.ok) {
+              const defaultName = currentUser.displayName || currentUser.email?.split('@')[0] || 'User';
+              const defaultAvatar = currentUser.photoURL || '';
               await fetch('/api/profiles', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   uid: currentUser.uid,
-                  display_name: currentUser.displayName || currentUser.email?.split('@')[0] || 'User',
+                  display_name: defaultName,
                   email: currentUser.email || '',
-                  avatar_url: currentUser.photoURL || '',
+                  avatar_url: defaultAvatar,
                 }),
               });
+              setDbName(defaultName);
+              setDbAvatar(defaultAvatar);
+              localStorage.setItem(`profile_name_${currentUser.uid}`, defaultName);
+              localStorage.setItem(`profile_avatar_${currentUser.uid}`, defaultAvatar);
+            } else {
+              const data = await res.json();
+              if (data) {
+                setDbName(data.display_name || '');
+                setDbAvatar(data.avatar_url || '');
+                localStorage.setItem(`profile_name_${currentUser.uid}`, data.display_name || '');
+                localStorage.setItem(`profile_avatar_${currentUser.uid}`, data.avatar_url || '');
+              }
             }
-            // Mark as registered for 7 days
             localStorage.setItem(cacheKey, String(Date.now()));
           } catch (err) {
             console.error('Auto-register profile failed:', err);
           }
         }
+      } else {
+        setDbName('');
+        setDbAvatar('');
       }
     });
     return () => unsubscribe();
   }, []);
 
-  const userName = user?.displayName || user?.email?.split('@')[0] || '';
+  const updateLocalProfile = (name: string, avatar: string) => {
+    setDbName(name);
+    setDbAvatar(avatar);
+    if (user) {
+      localStorage.setItem(`profile_name_${user.uid}`, name);
+      localStorage.setItem(`profile_avatar_${user.uid}`, avatar);
+    }
+  };
+
+  const userName = dbName || user?.displayName || user?.email?.split('@')[0] || '';
+  const userAvatar = dbAvatar || user?.photoURL || '';
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, userName }}>
+    <AuthContext.Provider value={{ user, isLoading, userName, userAvatar, updateLocalProfile }}>
       {children}
     </AuthContext.Provider>
   );

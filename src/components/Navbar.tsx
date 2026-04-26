@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { signOut, type User } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
+import { useAuth } from '../contexts/AuthContext';
 
-interface NavbarProps {
-  user: User | null;
-}
-
-export default function Navbar({ user }: NavbarProps) {
+export default function Navbar() {
   const [isVisible, setIsVisible] = useState(true);
+  const { user, userName, userAvatar } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,10 +60,10 @@ export default function Navbar({ user }: NavbarProps) {
         {user ? (
           <div className="user-profile">
             <Link to="/mypage" className="user-avatar-link">
-              {user.photoURL ? (
-                <img src={user.photoURL} alt="User" />
+              {userAvatar ? (
+                <img src={userAvatar} alt="User" />
               ) : (
-                <div className="user-avatar-mini">{(user.displayName || user.email || '?').charAt(0).toUpperCase()}</div>
+                <div className="user-avatar-mini">{(userName || '?').charAt(0).toUpperCase()}</div>
               )}
             </Link>
             <button onClick={handleLogout} className="btn outline-btn">
