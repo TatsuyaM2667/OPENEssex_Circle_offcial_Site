@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import AuthorBadge from '../components/AuthorBadge';
+import MemberSuggestInput from '../components/MemberSuggestInput';
 
 interface ProjectItem {
   id: number;
@@ -23,6 +24,8 @@ export default function Projects() {
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('planning');
   const [coAuthors, setCoAuthors] = useState('');
+  const [authorInput, setAuthorInput] = useState('');
+  const [membersList, setMembersList] = useState<string[]>([]);
 
   const [editId, setEditId] = useState<number | null>(null);
 
@@ -34,7 +37,17 @@ export default function Projects() {
 
   useEffect(() => {
     fetchItems();
+    fetch('/api/profiles')
+      .then(res => res.json())
+      .then((data: any[]) => setMembersList(data.map(p => p.display_name).filter(Boolean)))
+      .catch(console.error);
   }, []);
+
+  useEffect(() => {
+    if (userName && !authorInput && !editId) {
+      setAuthorInput(userName);
+    }
+  }, [userName, authorInput, editId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +66,7 @@ export default function Projects() {
       } else {
         const res = await fetch('/api/projects', {
           method: 'POST',
-          body: JSON.stringify({ title, description, author: userName, status, co_authors: coAuthors }),
+          body: JSON.stringify({ title, description, author: authorInput || userName, status, co_authors: coAuthors }),
           headers: { 'Content-Type': 'application/json' }
         });
         if (res.ok) fetchItems();
@@ -74,6 +87,7 @@ export default function Projects() {
     setDescription(item.description);
     setStatus(item.status);
     setCoAuthors(item.co_authors || '');
+    setAuthorInput(item.author || userName);
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -106,25 +120,46 @@ export default function Projects() {
       <button onClick={() => {
         setShowForm(!showForm);
         if (editId) { setEditId(null); setTitle(''); setDescription(''); setStatus('planning'); setCoAuthors(''); }
+        if (!showForm && !editId) setAuthorInput(userName);
       }} className="btn btn-primary" style={{ marginBottom: '2rem' }}>
         {showForm ? 'キャンセル' : '新規企画を提案する'}
       </button>
 
       {showForm && (
         <form onSubmit={handleSubmit} className="post-form glass-panel">
-          <div className="form-group row">
-            <div className="auto-author-badge">提案者: {userName}</div>
+          <div className="form-group row" style={{ alignItems: 'flex-start' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>提案者</label>
+              <MemberSuggestInput
+                value={authorInput}
+                onChange={setAuthorInput}
+                members={membersList}
+                placeholder="提案者"
+              />
+            </div>
             {editId && (
-              <select value={status} onChange={e => setStatus(e.target.value)} className="input-field">
-                <option value="planning">企画中 (Planning)</option>
-                <option value="in-progress">進行中 (In Progress)</option>
-                <option value="completed">完了 (Completed)</option>
-              </select>
+              <div style={{ flex: 1, marginLeft: '1rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>ステータス</label>
+                <select value={status} onChange={e => setStatus(e.target.value)} className="input-field">
+                  <option value="planning">企画中 (Planning)</option>
+                  <option value="in-progress">進行中 (In Progress)</option>
+                  <option value="completed">完了 (Completed)</option>
+                </select>
+              </div>
             )}
           </div>
 
+          <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>企画のタイトル</label>
           <input type="text" placeholder="企画のタイトル" value={title} onChange={e => setTitle(e.target.value)} required className="input-field" />
-          <input type="text" placeholder="共同提案者の表示名（カンマ区切り。例: user1, user2）" value={coAuthors} onChange={e => setCoAuthors(e.target.value)} className="input-field" />
+          
+          <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>共同提案者</label>
+          <MemberSuggestInput
+            value={coAuthors}
+            onChange={setCoAuthors}
+            members={membersList}
+            placeholder="共同提案者の表示名（カンマ区切り。例: user1, user2）"
+            multiple
+          />
 
           <textarea placeholder="企画の詳細（目的、必要なもの、協力してほしいことなど）" value={description} onChange={e => setDescription(e.target.value)} rows={6} className="input-field" required />
 

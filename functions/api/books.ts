@@ -6,7 +6,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const { DB } = context.env;
   const { results } = await DB.prepare("SELECT * FROM books ORDER BY created_at DESC").all();
   return Response.json(results, {
-    headers: { 'Cache-Control': 'public, max-age=60, s-maxage=120' }
+    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
   });
 };
 
