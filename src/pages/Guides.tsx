@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -11,6 +12,7 @@ interface Guide {
 }
 
 export default function Guides() {
+  const { userName } = useAuth();
   const [guides, setGuides] = useState<Guide[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -100,6 +102,7 @@ export default function Guides() {
 
       {showForm && (
         <form onSubmit={handleSubmit} className="post-form glass-panel">
+          <div className="auto-author-badge" style={{ marginBottom: '1rem' }}>投稿者: {userName}</div>
           <input type="text" placeholder="ガイドのタイトル" value={title} onChange={e => setTitle(e.target.value)} required className="input-field" />
           <textarea placeholder="ガイドの内容（Markdown対応）" value={content} onChange={e => setContent(e.target.value)} required rows={15} className="input-field" />
           <p style={{ fontSize: '0.8rem', marginTop: '-0.5rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>※Markdown記法（# 見出し, * リスト, **太字** など）が使えます</p>

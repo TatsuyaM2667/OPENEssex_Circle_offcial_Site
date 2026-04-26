@@ -76,6 +76,17 @@ export default function Home() {
               <span className="feature-action">アクセス →</span>
             </div>
           </Link>
+
+          <Link to="/members" className="feature-card glass-panel highlight-card">
+            <div className="feature-icon-wrapper">
+              <span className="feature-icon">👥</span>
+            </div>
+            <div className="feature-content">
+              <h3 className="feature-title">メンバー一覧</h3>
+              <p className="feature-desc">Open Essexのメンバーを見て繋がろう</p>
+              <span className="feature-action">見てみる →</span>
+            </div>
+          </Link>
         </div>
       </section>
     </>

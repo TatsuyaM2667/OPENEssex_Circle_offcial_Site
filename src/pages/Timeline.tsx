@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface TimelineItem {
   id: number;
@@ -12,6 +13,7 @@ interface TimelineItem {
 }
 
 export default function Timeline() {
+  const { userName } = useAuth();
   const [items, setItems] = useState<TimelineItem[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,7 +22,6 @@ export default function Timeline() {
   const [url, setUrl] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [author, setAuthor] = useState('');
 
   const [editId, setEditId] = useState<number | null>(null);
 
@@ -51,7 +52,7 @@ export default function Timeline() {
       } else {
         const res = await fetch('/api/timeline', {
           method: 'POST',
-          body: JSON.stringify({ type, url, title, description, author }),
+          body: JSON.stringify({ type, url, title, description, author: userName }),
           headers: { 'Content-Type': 'application/json' }
         });
         if (res.ok) fetchItems();
@@ -60,7 +61,6 @@ export default function Timeline() {
       setUrl('');
       setTitle('');
       setDescription('');
-      if (!editId) setAuthor('');
       setShowForm(false);
     } finally {
       setIsSubmitting(false);
@@ -73,7 +73,6 @@ export default function Timeline() {
     setUrl(item.url);
     setTitle(item.title);
     setDescription(item.description);
-    setAuthor(item.author);
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -111,7 +110,7 @@ export default function Timeline() {
 
       <button onClick={() => {
         setShowForm(!showForm);
-        if (editId) { setEditId(null); setUrl(''); setTitle(''); setDescription(''); setAuthor(''); setType('youtube'); }
+        if (editId) { setEditId(null); setUrl(''); setTitle(''); setDescription(''); setType('youtube'); }
       }} className="btn btn-primary" style={{ marginBottom: '2rem' }}>
         {showForm ? 'キャンセル' : '新規共有'}
       </button>
@@ -124,7 +123,7 @@ export default function Timeline() {
               <option value="news">ニュース記事</option>
               <option value="other">その他リンク</option>
             </select>
-            {!editId && <input type="text" placeholder="投稿者名" value={author} onChange={e => setAuthor(e.target.value)} required className="input-field" />}
+            <div className="auto-author-badge">投稿者: {userName}</div>
           </div>
 
           <input type="url" placeholder="URL (例: https://youtube.com/... or https://...)" value={url} onChange={e => setUrl(e.target.value)} required className="input-field" />

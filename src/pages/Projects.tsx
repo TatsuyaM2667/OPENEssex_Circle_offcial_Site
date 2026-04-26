@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface ProjectItem {
   id: number;
@@ -11,13 +12,13 @@ interface ProjectItem {
 }
 
 export default function Projects() {
+  const { userName } = useAuth();
   const [items, setItems] = useState<ProjectItem[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [author, setAuthor] = useState('');
   const [status, setStatus] = useState('planning');
 
   const [editId, setEditId] = useState<number | null>(null);
@@ -49,14 +50,13 @@ export default function Projects() {
       } else {
         const res = await fetch('/api/projects', {
           method: 'POST',
-          body: JSON.stringify({ title, description, author, status }),
+          body: JSON.stringify({ title, description, author: userName, status }),
           headers: { 'Content-Type': 'application/json' }
         });
         if (res.ok) fetchItems();
       }
       setTitle('');
       setDescription('');
-      if (!editId) setAuthor('');
       setStatus('planning');
       setShowForm(false);
     } finally {
@@ -68,7 +68,6 @@ export default function Projects() {
     setEditId(item.id);
     setTitle(item.title);
     setDescription(item.description);
-    setAuthor(item.author);
     setStatus(item.status);
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -101,7 +100,7 @@ export default function Projects() {
 
       <button onClick={() => {
         setShowForm(!showForm);
-        if (editId) { setEditId(null); setTitle(''); setDescription(''); setAuthor(''); setStatus('planning'); }
+        if (editId) { setEditId(null); setTitle(''); setDescription(''); setStatus('planning'); }
       }} className="btn btn-primary" style={{ marginBottom: '2rem' }}>
         {showForm ? 'キャンセル' : '新規企画を提案する'}
       </button>
@@ -109,7 +108,7 @@ export default function Projects() {
       {showForm && (
         <form onSubmit={handleSubmit} className="post-form glass-panel">
           <div className="form-group row">
-            {!editId && <input type="text" placeholder="提案者名" value={author} onChange={e => setAuthor(e.target.value)} required className="input-field" />}
+            <div className="auto-author-badge">提案者: {userName}</div>
             {editId && (
               <select value={status} onChange={e => setStatus(e.target.value)} className="input-field">
                 <option value="planning">企画中 (Planning)</option>

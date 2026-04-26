@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -13,11 +14,12 @@ interface Book {
 }
 
 export default function Books() {
+  const { userName } = useAuth();
   const [books, setBooks] = useState<Book[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
+  const [bookAuthor, setBookAuthor] = useState('');
   const [description, setDescription] = useState('');
   const [link, setLink] = useState('');
   const [editId, setEditId] = useState<number | null>(null);
@@ -49,13 +51,13 @@ export default function Books() {
       } else {
         const res = await fetch('/api/books', {
           method: 'POST',
-          body: JSON.stringify({ title, author, description, link }),
+          body: JSON.stringify({ title, author: bookAuthor, description, link }),
           headers: { 'Content-Type': 'application/json' }
         });
         if (res.ok) fetchBooks();
       }
       setTitle('');
-      setAuthor('');
+      setBookAuthor('');
       setDescription('');
       setLink('');
       setShowForm(false);
@@ -67,7 +69,7 @@ export default function Books() {
   const handleEdit = (book: Book) => {
     setEditId(book.id);
     setTitle(book.title);
-    setAuthor(book.author); // Author/Link 編集不可仕様とするか、今回はシンプルに全てセット
+    setBookAuthor(book.author);
     setDescription(book.description);
     setLink(book.link);
     setShowForm(true);
@@ -97,19 +99,20 @@ export default function Books() {
   return (
     <div className="page-container">
       <h1>おすすめ本</h1>
-      <p className="page-subtitle">おすすめの本</p>
+      <p className="page-subtitle">おすすめの本を共有</p>
 
       <button onClick={() => {
         setShowForm(!showForm);
-        if (editId) { setEditId(null); setTitle(''); setAuthor(''); setDescription(''); setLink(''); }
+        if (editId) { setEditId(null); setTitle(''); setBookAuthor(''); setDescription(''); setLink(''); }
       }} className="btn btn-primary" style={{ marginBottom: '2rem' }}>
         {showForm ? 'キャンセル' : '本を推薦する'}
       </button>
 
       {showForm && (
         <form onSubmit={handleSubmit} className="post-form glass-panel">
+          <div className="auto-author-badge" style={{ marginBottom: '1rem' }}>推薦者: {userName}</div>
           <input type="text" placeholder="本のタイトル" value={title} onChange={e => setTitle(e.target.value)} required className="input-field" />
-          {!editId && <input type="text" placeholder="著者" value={author} onChange={e => setAuthor(e.target.value)} required className="input-field" />}
+          {!editId && <input type="text" placeholder="著者名" value={bookAuthor} onChange={e => setBookAuthor(e.target.value)} required className="input-field" />}
           <textarea placeholder="推薦理由・説明（Markdown対応）" value={description} onChange={e => setDescription(e.target.value)} required rows={8} className="input-field" />
           {!editId && <input type="url" placeholder="関連リンク (URL)" value={link} onChange={e => setLink(e.target.value)} className="input-field" />}
           <p style={{ fontSize: '0.8rem', margin: '-0.5rem 0 1rem', color: 'var(--text-muted)' }}>※Markdown記法が使えます</p>

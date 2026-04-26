@@ -13,6 +13,8 @@ export default function Footer() {
             <li><Link to="/projects">企画セクション</Link></li>
             <li><Link to="/guides">エキスパートガイド</Link></li>
             <li><Link to="/books">おすすめ本</Link></li>
+            <li><Link to="/members">メンバー一覧</Link></li>
+            <li><Link to="/mypage">マイページ</Link></li>
           </ul>
         </div>
         

@@ -824,3 +824,408 @@ code {
     display: none;
   }
 }
+
+/* Auto Author Badge */
+.auto-author-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, rgba(217, 37, 67, 0.1), rgba(255, 107, 53, 0.1));
+  border: 1px solid rgba(217, 37, 67, 0.2);
+  border-radius: 100px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--brand-red);
+  white-space: nowrap;
+}
+.form-group.row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* User Avatar Mini (Navbar) */
+.user-avatar-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+.user-avatar-mini {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--brand-gradient);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 2px solid var(--brand-orange);
+}
+
+/* ========== Members Page ========== */
+.members-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+.member-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1.5rem;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 24px;
+}
+.member-card:hover {
+  border-color: var(--brand-red);
+}
+.member-avatar-wrapper {
+  margin-bottom: 1rem;
+}
+.member-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--brand-red);
+  transition: transform 0.3s ease;
+}
+.member-card:hover .member-avatar {
+  transform: scale(1.1);
+}
+.member-avatar-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--brand-gradient);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  border: 3px solid transparent;
+  transition: transform 0.3s ease;
+}
+.member-card:hover .member-avatar-placeholder {
+  transform: scale(1.1);
+}
+.member-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+.member-name {
+  font-size: 1.2rem;
+  margin: 0;
+  color: var(--text-h);
+}
+.member-role {
+  font-size: 0.85rem;
+  color: var(--brand-red);
+  font-weight: 600;
+  padding: 2px 12px;
+  background: rgba(217, 37, 67, 0.08);
+  border-radius: 100px;
+}
+.member-bio {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0.3rem 0 0;
+  line-height: 1.5;
+}
+.member-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+.skill-tag {
+  padding: 3px 10px;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #818cf8;
+}
+
+/* ========== Profile Page ========== */
+.profile-page {
+  max-width: 800px;
+}
+.profile-header {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  margin-bottom: 2rem;
+}
+.profile-header:hover {
+  transform: none;
+}
+.profile-banner {
+  height: 140px;
+  background: var(--brand-gradient);
+  border-radius: 24px 24px 0 0;
+  opacity: 0.8;
+}
+.profile-main-info {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+  padding: 0 2rem 2rem;
+  margin-top: -50px;
+  position: relative;
+  z-index: 1;
+}
+.profile-avatar-large-wrapper {
+  flex-shrink: 0;
+}
+.profile-avatar-large {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--glass-bg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+.profile-avatar-large-placeholder {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--brand-gradient);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  border: 4px solid var(--glass-bg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+.profile-identity {
+  padding-bottom: 0.5rem;
+}
+.profile-identity h1 {
+  font-size: 1.8rem;
+  margin: 0 0 0.3rem;
+}
+.profile-role-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  background: rgba(217, 37, 67, 0.1);
+  border: 1px solid rgba(217, 37, 67, 0.2);
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--brand-red);
+}
+.profile-join-date {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0.5rem 0 0;
+}
+.profile-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.profile-section {
+  padding: 2rem;
+}
+.profile-section:hover {
+  transform: none;
+}
+.profile-section h3 {
+  font-size: 1.1rem;
+  margin: 0 0 1rem;
+  color: var(--text-h);
+}
+.profile-section p {
+  margin: 0;
+  line-height: 1.7;
+}
+.profile-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.profile-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.profile-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+.profile-link-btn:hover {
+  background: rgba(217, 37, 67, 0.1);
+  border-color: var(--brand-red);
+  color: var(--brand-red);
+  transform: translateY(-2px);
+}
+
+/* ========== MyPage ========== */
+.mypage-container {
+  max-width: 700px;
+}
+.mypage-welcome {
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+  border-left: 4px solid var(--brand-orange);
+}
+.mypage-welcome:hover {
+  transform: none;
+}
+.mypage-welcome h3 {
+  margin: 0 0 0.5rem;
+}
+.mypage-welcome p {
+  margin: 0;
+}
+.mypage-message {
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+.mypage-message.success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+.mypage-message.error {
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  color: #ff6b7a;
+}
+.mypage-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.mypage-section {
+  padding: 2rem;
+}
+.mypage-section:hover {
+  transform: none;
+}
+.mypage-section h3 {
+  font-size: 1.2rem;
+  margin: 0 0 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+.mypage-avatar-editor {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+.mypage-avatar-preview {
+  flex-shrink: 0;
+}
+.mypage-avatar-input {
+  flex: 1;
+}
+.mypage-avatar-input label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.mypage-form .form-group {
+  margin-bottom: 1rem;
+}
+.mypage-form .form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+.field-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0.3rem 0 0;
+}
+.mypage-save-btn {
+  width: 100%;
+  padding: 16px;
+  font-size: 1.1rem;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 3rem 0;
+}
+
+/* Responsive adjustments for new pages */
+@media (max-width: 768px) {
+  .members-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .member-card {
+    padding: 1.5rem 1rem;
+  }
+  .member-avatar, .member-avatar-placeholder {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+  }
+  .profile-main-info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 1.5rem 1.5rem;
+  }
+  .profile-identity h1 {
+    font-size: 1.4rem;
+  }
+  .profile-section {
+    padding: 1.5rem;
+  }
+  .mypage-avatar-editor {
+    flex-direction: column;
+    align-items: center;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .mypage-section {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .members-grid {
+    grid-template-columns: 1fr;
+  }
+}

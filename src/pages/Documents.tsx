@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -12,12 +13,12 @@ interface Document {
 }
 
 export default function Documents() {
+  const { userName } = useAuth();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [author, setAuthor] = useState('');
 
   const [editId, setEditId] = useState<number | null>(null);
 
@@ -48,14 +49,13 @@ export default function Documents() {
       } else {
         const res = await fetch('/api/documents', {
           method: 'POST',
-          body: JSON.stringify({ title, content, author }),
+          body: JSON.stringify({ title, content, author: userName }),
           headers: { 'Content-Type': 'application/json' }
         });
         if (res.ok) fetchDocuments();
       }
       setTitle('');
       setContent('');
-      if (!editId) setAuthor('');
       setShowForm(false);
     } finally {
       setIsSubmitting(false);
@@ -66,7 +66,6 @@ export default function Documents() {
     setEditId(doc.id);
     setTitle(doc.title);
     setContent(doc.content);
-    setAuthor(doc.author);
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -98,7 +97,7 @@ export default function Documents() {
 
       <button onClick={() => {
         setShowForm(!showForm);
-        if (editId) { setEditId(null); setTitle(''); setContent(''); setAuthor(''); }
+        if (editId) { setEditId(null); setTitle(''); setContent(''); }
       }} className="btn btn-primary" style={{ marginBottom: '2rem' }}>
         {showForm ? 'キャンセル' : '新規投稿'}
       </button>
@@ -107,7 +106,7 @@ export default function Documents() {
         <form onSubmit={handleSubmit} className="post-form glass-panel">
           <div className="form-group row">
             <input type="text" placeholder="タイトル" value={title} onChange={e => setTitle(e.target.value)} required className="input-field" />
-            {!editId && <input type="text" placeholder="投稿者名" value={author} onChange={e => setAuthor(e.target.value)} required className="input-field" />}
+            <div className="auto-author-badge">投稿者: {userName}</div>
           </div>
           <textarea placeholder="内容・説明（Markdown対応）" value={content} onChange={e => setContent(e.target.value)} required rows={10} className="input-field" />
           <p style={{ fontSize: '0.8rem', marginTop: '-0.5rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>※Markdown記法（# 見出し, * リスト, **太字** など）が使えます</p>

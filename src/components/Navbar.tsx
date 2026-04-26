@@ -55,13 +55,19 @@ export default function Navbar({ user }: NavbarProps) {
           <li><Link to="/projects">企画</Link></li>
           <li><Link to="/guides">ガイド</Link></li>
           <li><Link to="/books">おすすめ本</Link></li>
+          <li><Link to="/members">メンバー</Link></li>
         </ul>
       </div>
       <div className="navbar-auth">
         {user ? (
           <div className="user-profile">
-            {user.photoURL && <img src={user.photoURL} alt="User" />}
-            <span className="user-name">{user.displayName || user.email}</span>
+            <Link to="/mypage" className="user-avatar-link">
+              {user.photoURL ? (
+                <img src={user.photoURL} alt="User" />
+              ) : (
+                <div className="user-avatar-mini">{(user.displayName || user.email || '?').charAt(0).toUpperCase()}</div>
+              )}
+            </Link>
             <button onClick={handleLogout} className="btn outline-btn">
               ログアウト
             </button>

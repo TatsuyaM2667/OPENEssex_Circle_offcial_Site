@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { onAuthStateChanged, type User } from 'firebase/auth';
-import { auth } from './firebase';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -11,9 +9,11 @@ import Books from './pages/Books';
 import Timeline from './pages/Timeline';
 import Projects from './pages/Projects';
 import Login from './pages/Login';
+import Members from './pages/Members';
+import Profile from './pages/Profile';
+import MyPage from './pages/MyPage';
 import './App.css';
 
-// エラー境界用の簡易コンポーネント
 function ErrorBoundary({ children }: { children: React.ReactNode }) {
   try {
     return <>{children}</>;
@@ -23,42 +23,41 @@ function ErrorBoundary({ children }: { children: React.ReactNode }) {
   }
 }
 
-function ProtectedRoute({ children, isLoggedIn, isLoading }: { children: React.ReactNode, isLoggedIn: boolean, isLoading: boolean }) {
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useAuth();
   if (isLoading) return <div className="page-container"><p>認証状態を確認中...</p></div>;
-  if (!isLoggedIn) return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/login" replace />;
   return <>{children}</>;
 }
 
-function App() {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+function AppRoutes() {
+  const { user } = useAuth();
 
-  useEffect(() => {
-    if (!auth) {
-      setIsLoading(false);
-      return;
-    }
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setIsLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
+      <Route path="/members" element={<ProtectedRoute><Members /></ProtectedRoute>} />
+      <Route path="/profile/:uid" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/mypage" element={<ProtectedRoute><MyPage /></ProtectedRoute>} />
+      <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
+      <Route path="/guides" element={<ProtectedRoute><Guides /></ProtectedRoute>} />
+      <Route path="/books" element={<ProtectedRoute><Books /></ProtectedRoute>} />
+      <Route path="/timeline" element={<ProtectedRoute><Timeline /></ProtectedRoute>} />
+      <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+    </Routes>
+  );
+}
+
+function AppContent() {
+  const { user } = useAuth();
 
   return (
     <Router>
       <Navbar user={user} />
       <main>
         <ErrorBoundary>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
-            <Route path="/documents" element={<ProtectedRoute isLoggedIn={!!user} isLoading={isLoading}><Documents /></ProtectedRoute>} />
-            <Route path="/guides" element={<ProtectedRoute isLoggedIn={!!user} isLoading={isLoading}><Guides /></ProtectedRoute>} />
-            <Route path="/books" element={<ProtectedRoute isLoggedIn={!!user} isLoading={isLoading}><Books /></ProtectedRoute>} />
-            <Route path="/timeline" element={<ProtectedRoute isLoggedIn={!!user} isLoading={isLoading}><Timeline /></ProtectedRoute>} />
-            <Route path="/projects" element={<ProtectedRoute isLoggedIn={!!user} isLoading={isLoading}><Projects /></ProtectedRoute>} />
-          </Routes>
+          <AppRoutes />
         </ErrorBoundary>
       </main>
       <Footer />
@@ -66,5 +65,12 @@ function App() {
   );
 }
 
-export default App;
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
 
+export default App;
