@@ -49,6 +49,7 @@ export default function Calendar() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState('');
   const [editId, setEditId] = useState<number | null>(null);
 
@@ -237,6 +238,40 @@ export default function Calendar() {
     }
   };
 
+  const handleGenerate = async () => {
+    if (!user || !userName) {
+      setError('ログインしてプロフィールを設定してください。');
+      return;
+    }
+    if (!confirm(`${currentYear}年${currentMonth + 1}月の平日(月〜金)に、午前授業(10:00-12:00)と午後授業(13:00-15:00)の予定を一括で追加しますか？\n(既に登録されている日はスキップされます)`)) return;
+
+    setIsGenerating(true);
+    setError('');
+    
+    try {
+      const res = await fetch('/api/calendar/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          year: currentYear,
+          month: currentMonth + 1,
+          author_uid: user.uid,
+          author_name: userName,
+          author_avatar: userAvatar || '',
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '一括登録に失敗しました');
+      
+      alert(`${data.count > 0 ? `${data.count}件の授業予定を追加しました！` : '追加する予定はありませんでした（既に登録済みの場合など）'}`);
+      await fetchEvents(currentYear, currentMonth);
+    } catch (err: any) {
+      setError(`エラー: ${err?.message}`);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const selectedEvents = selectedDate ? eventsByDate[selectedDate] || [] : [];
   const todayStr = formatDate(today.getFullYear(), today.getMonth(), today.getDate());
 
@@ -364,12 +399,22 @@ export default function Calendar() {
 
       {/* Add Event Button */}
       {user && !showForm && (
-        <button
-          className="btn btn-primary cal-add-btn"
-          onClick={() => openNewEventForm()}
-        >
-          ＋ 予定を追加する
-        </button>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center', margin: '2rem 0' }}>
+          <button
+            className="btn btn-primary"
+            onClick={() => openNewEventForm()}
+          >
+            ＋ 予定を追加する
+          </button>
+          <button
+            className="btn outline-btn"
+            onClick={handleGenerate}
+            disabled={isGenerating}
+            title="平日（月〜金）に午前授業・午後授業を一括登録します"
+          >
+            {isGenerating ? '⏳ 処理中...' : '📅 通常授業(午前/午後)を一括登録'}
+          </button>
+        </div>
       )}
 
       {/* Event Form */}
