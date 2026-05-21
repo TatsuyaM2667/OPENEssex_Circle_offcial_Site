@@ -249,7 +249,7 @@ export default function Calendar() {
     setError('');
     
     try {
-      const res = await fetch('/api/calendar/generate', {
+      const res = await fetch('/api/calendar-generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -565,7 +565,7 @@ export default function Calendar() {
                   {ev.description && (
                     <p className="cal-event-desc">{ev.description}</p>
                   )}
-                  {user && user.uid === ev.author_uid && (
+                  {user && (user.uid === ev.author_uid || ev.author_name === 'Open Essex') && (
                     <div className="cal-event-actions">
                       <button
                         className="btn btn-edit"
