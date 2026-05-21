@@ -51,6 +51,7 @@ export default function Navbar() {
           <li><Link to="/timeline">タイムライン</Link></li>
           <li><Link to="/documents">課題・資料</Link></li>
           <li><Link to="/projects">企画</Link></li>
+          <li><Link to="/calendar">カレンダー</Link></li>
           <li><Link to="/guides">ガイド</Link></li>
           <li><Link to="/books">おすすめ本</Link></li>
           <li><Link to="/members">メンバー</Link></li>

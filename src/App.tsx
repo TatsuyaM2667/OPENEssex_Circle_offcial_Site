@@ -13,6 +13,7 @@ import Login from './pages/Login';
 import Members from './pages/Members';
 import Profile from './pages/Profile';
 import MyPage from './pages/MyPage';
+import Calendar from './pages/Calendar';
 import './App.css';
 
 function ErrorBoundary({ children }: { children: React.ReactNode }) {
@@ -49,6 +50,7 @@ function AppRoutes() {
       <Route path="/books" element={<ProtectedRoute><Books /></ProtectedRoute>} />
       <Route path="/timeline" element={<ProtectedRoute><Timeline /></ProtectedRoute>} />
       <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
+      <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
     </Routes>
   );
 }
