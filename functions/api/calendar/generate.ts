@@ -9,9 +9,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const data: any = await context.request.json();
     const { year, month, author_uid, author_name, author_avatar } = data;
     
-    if (!year || !month || !author_uid || !author_name) {
+    if (!year || !month || !author_uid) {
       return Response.json({ error: 'Missing required fields' }, { status: 400 });
     }
+    
+    // サークルの公式アイコンと名前を強制使用
+    const circleName = "Open Essex";
+    const circleAvatar = "/OpenEssex.png";
 
     const prefix = `${year}-${String(month).padStart(2, '0')}`;
     
@@ -29,15 +33,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       const date = new Date(year, month - 1, day);
       const dayOfWeek = date.getDay();
       
-      // 平日 (1:月曜日 〜 5:金曜日)
-      if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+      // 火曜日(2)と木曜日(4)のみ
+      if (dayOfWeek === 2 || dayOfWeek === 4) {
         const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         
         if (!existing.has(`${dateStr}_午前授業`)) {
           statements.push(
             DB.prepare(
               `INSERT INTO calendar_events (title, description, event_date, start_time, end_time, color, author_uid, author_name, author_avatar) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-            ).bind('午前授業', '', dateStr, '10:00', '12:00', '#3b82f6', author_uid, author_name, author_avatar || '')
+            ).bind('午前授業', '', dateStr, '10:00', '12:00', '#3b82f6', author_uid, circleName, circleAvatar)
           );
         }
         
@@ -45,7 +49,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           statements.push(
             DB.prepare(
               `INSERT INTO calendar_events (title, description, event_date, start_time, end_time, color, author_uid, author_name, author_avatar) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-            ).bind('午後授業', '', dateStr, '13:00', '15:00', '#f59e0b', author_uid, author_name, author_avatar || '')
+            ).bind('午後授業', '', dateStr, '13:00', '15:00', '#f59e0b', author_uid, circleName, circleAvatar)
           );
         }
       }

@@ -243,7 +243,7 @@ export default function Calendar() {
       setError('ログインしてプロフィールを設定してください。');
       return;
     }
-    if (!confirm(`${currentYear}年${currentMonth + 1}月の平日(月〜金)に、午前授業(10:00-12:00)と午後授業(13:00-15:00)の予定を一括で追加しますか？\n(既に登録されている日はスキップされます)`)) return;
+    if (!confirm(`${currentYear}年${currentMonth + 1}月の火・木曜日に、午前授業(10:00-12:00)と午後授業(13:00-15:00)の予定を一括で追加しますか？\n(既に登録されている日はスキップされます)`)) return;
 
     setIsGenerating(true);
     setError('');
@@ -410,7 +410,7 @@ export default function Calendar() {
             className="btn outline-btn"
             onClick={handleGenerate}
             disabled={isGenerating}
-            title="平日（月〜金）に午前授業・午後授業を一括登録します"
+            title="火曜日と木曜日に午前授業・午後授業を一括登録します"
           >
             {isGenerating ? '⏳ 処理中...' : '📅 通常授業(午前/午後)を一括登録'}
           </button>
