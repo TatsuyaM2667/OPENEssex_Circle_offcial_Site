@@ -36,8 +36,9 @@ export default function Members() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCTO, setIsCTO] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
-  const [editingRole, setEditingRole] = useState<string | null>(null);
+  const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
   const [newRole, setNewRole] = useState("");
+  const [newAvatarUrl, setNewAvatarUrl] = useState("");
   const [adminMessage, setAdminMessage] = useState("");
 
   const fetchMembers = async () => {
@@ -76,8 +77,8 @@ export default function Members() {
     fetchMembers();
   }, [user]);
 
-  const handleUpdateRole = async (targetUid: string) => {
-    if (!user || !newRole.trim()) return;
+  const handleUpdateMember = async (targetUid: string) => {
+    if (!user || (!newRole.trim() && !newAvatarUrl.trim())) return;
     setAdminMessage("");
     try {
       const res = await fetch("/api/admin", {
@@ -85,16 +86,18 @@ export default function Members() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           admin_uid: user.uid,
-          action: "update_role",
+          action: "update_member",
           target_uid: targetUid,
           new_role: newRole.trim(),
+          new_avatar_url: newAvatarUrl.trim(),
         }),
       });
       const data = await res.json();
       if (res.ok) {
-        setAdminMessage("✅ 役職を更新しました");
-        setEditingRole(null);
+        setAdminMessage("✅ メンバー情報を更新しました");
+        setEditingMemberId(null);
         setNewRole("");
+        setNewAvatarUrl("");
         await fetchMembers();
       } else {
         setAdminMessage(`❌ ${data.error}`);
@@ -291,12 +294,12 @@ export default function Members() {
                     </div>
                   </div>
 
-                  {editingRole === member.uid ? (
+                  {editingMemberId === member.uid ? (
                     <div
                       style={{
                         display: "flex",
+                        flexDirection: "column",
                         gap: "0.5rem",
-                        alignItems: "center",
                       }}
                     >
                       <input
@@ -309,29 +312,45 @@ export default function Members() {
                           marginBottom: 0,
                           padding: "6px 12px",
                           fontSize: "0.85rem",
-                          width: "150px",
+                          width: "300px",
                         }}
                       />
-                      <button
-                        className="btn btn-primary"
-                        style={{ padding: "6px 16px", fontSize: "0.85rem" }}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleUpdateRole(member.uid);
+                      <input
+                        type="text"
+                        value={newAvatarUrl}
+                        onChange={(e) => setNewAvatarUrl(e.target.value)}
+                        placeholder="新しいアイコン画像URL"
+                        className="input-field"
+                        style={{
+                          marginBottom: 0,
+                          padding: "6px 12px",
+                          fontSize: "0.85rem",
+                          width: "300px",
                         }}
-                      >
-                        保存
-                      </button>
-                      <button
-                        className="btn outline-btn"
-                        style={{ padding: "6px 16px", fontSize: "0.85rem" }}
-                        onClick={() => {
-                          setEditingRole(null);
-                          setNewRole("");
-                        }}
-                      >
-                        取消
-                      </button>
+                      />
+                      <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.2rem" }}>
+                        <button
+                          className="btn btn-primary"
+                          style={{ padding: "6px 16px", fontSize: "0.85rem" }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleUpdateMember(member.uid);
+                          }}
+                        >
+                          保存
+                        </button>
+                        <button
+                          className="btn outline-btn"
+                          style={{ padding: "6px 16px", fontSize: "0.85rem" }}
+                          onClick={() => {
+                            setEditingMemberId(null);
+                            setNewRole("");
+                            setNewAvatarUrl("");
+                          }}
+                        >
+                          取消
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -339,11 +358,12 @@ export default function Members() {
                         className="btn btn-edit"
                         style={{ padding: "6px 16px", fontSize: "0.85rem" }}
                         onClick={() => {
-                          setEditingRole(member.uid);
+                          setEditingMemberId(member.uid);
                           setNewRole(member.role);
+                          setNewAvatarUrl(member.avatar_url || "");
                         }}
                       >
-                        🏷️ 役職変更
+                        🏷️ 編集
                       </button>
                       <button
                         className="btn btn-delete"

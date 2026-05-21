@@ -23,16 +23,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return Response.json({ error: 'Permission denied. Only CTO can perform admin actions.' }, { status: 403 });
     }
 
-    if (data.action === 'update_role') {
-      if (!data.target_uid || !data.new_role) {
-        return Response.json({ error: 'target_uid and new_role are required' }, { status: 400 });
+    if (data.action === 'update_member') {
+      if (!data.target_uid) {
+        return Response.json({ error: 'target_uid is required' }, { status: 400 });
       }
 
       await DB.prepare(
-        "UPDATE profiles SET role = ?, updated_at = CURRENT_TIMESTAMP WHERE uid = ?"
-      ).bind(data.new_role, data.target_uid).run();
+        "UPDATE profiles SET role = ?, avatar_url = ?, updated_at = CURRENT_TIMESTAMP WHERE uid = ?"
+      ).bind(data.new_role || '', data.new_avatar_url || '', data.target_uid).run();
 
-      return Response.json({ success: true, message: 'Role updated' });
+      return Response.json({ success: true, message: 'Profile updated' });
     }
 
     if (data.action === 'delete_member') {
@@ -50,7 +50,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return Response.json({ success: true, message: 'Member deleted' });
     }
 
-    return Response.json({ error: 'Unknown action. Use "update_role" or "delete_member"' }, { status: 400 });
+    return Response.json({ error: 'Unknown action. Use "update_member" or "delete_member"' }, { status: 400 });
   } catch (error: any) {
     return Response.json({ error: 'Admin action failed', detail: error?.message }, { status: 500 });
   }
