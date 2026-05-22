@@ -86,3 +86,7 @@ npx wrangler d1 execute open-essex-db --remote --file=db_add_coauthors_others.sq
 ```bash
 npm run build
 ```
+## Contributor
+- [TatsuyaM2667](https://github.com/TatsuyaM2667)
+- [Mitsuifaisalss](https://github.com/Mitsuifaisalss)
+- 
