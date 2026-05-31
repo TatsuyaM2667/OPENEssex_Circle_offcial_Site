@@ -71,6 +71,20 @@ export default function Home() {
             </div>
           </Link>
 
+          <Link
+            to="/calendar"
+            className="feature-card glass-panel highlight-card"
+          >
+            <div className="feature-icon-wrapper">
+              <span className="feature-icon">📅</span>
+            </div>
+            <div className="feature-content">
+              <h3 className="feature-title">カレンダー</h3>
+              <p className="feature-desc">メンバーの予定を共有・確認できる共有カレンダー</p>
+              <span className="feature-action">予定を見る →</span>
+            </div>
+          </Link>
+
           <Link to="/guides" className="feature-card glass-panel">
             <div className="feature-icon-wrapper">
               <span className="feature-icon">🧭</span>

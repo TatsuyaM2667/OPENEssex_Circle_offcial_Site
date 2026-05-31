@@ -24,6 +24,8 @@ export default function Guides() {
   const [coAuthors, setCoAuthors] = useState('');
   const [editId, setEditId] = useState<number | null>(null);
   const [error, setError] = useState('');
+  const [expandedGuides, setExpandedGuides] = useState<{[id: number]: boolean}>({});
+  const [availableProfiles, setAvailableProfiles] = useState<{uid: string, display_name: string}[]>([]);
 
   const fetchGuides = async () => {
     try {
@@ -43,6 +45,10 @@ export default function Guides() {
 
   useEffect(() => {
     fetchGuides();
+    fetch('/api/profiles')
+      .then(res => res.json())
+      .then(data => setAvailableProfiles(data))
+      .catch(err => console.error(err));
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -108,16 +114,28 @@ export default function Guides() {
     fetchGuides();
   };
 
+  const canEdit = (guide: Guide) => {
+    if (!userName) return false;
+    if (!guide.poster || guide.poster === userName) return true;
+    if (guide.co_authors && guide.co_authors.split(',').map(s => s.trim()).includes(userName)) return true;
+    return false;
+  };
+
   const handleLike = async (id: number) => {
     const likedKey = `liked_guides_${id}`;
-    if (localStorage.getItem(likedKey)) return;
+    const isLiked = !!localStorage.getItem(likedKey);
 
-    setGuides(prev => prev.map(guide => guide.id === id ? { ...guide, likes: (guide.likes || 0) + 1 } : guide));
-    localStorage.setItem(likedKey, 'true');
+    setGuides(prev => prev.map(guide => guide.id === id ? { ...guide, likes: Math.max(0, (guide.likes || 0) + (isLiked ? -1 : 1)) } : guide));
+    
+    if (isLiked) {
+      localStorage.removeItem(likedKey);
+    } else {
+      localStorage.setItem(likedKey, 'true');
+    }
 
     await fetch(`/api/guides/${id}`, {
       method: 'PUT',
-      body: JSON.stringify({ action: 'like' }),
+      body: JSON.stringify({ action: isLiked ? 'unlike' : 'like' }),
       headers: { 'Content-Type': 'application/json' }
     });
   };
@@ -150,7 +168,36 @@ export default function Guides() {
         <form onSubmit={handleSubmit} className="post-form glass-panel">
           <div className="auto-author-badge" style={{ marginBottom: '1rem' }}>投稿者: {userName || '未設定'}</div>
           <input type="text" placeholder="ガイドのタイトル" value={title} onChange={e => setTitle(e.target.value)} required className="input-field" />
-          <input type="text" placeholder="共同投稿者の表示名（カンマ区切り。例: user1, user2）" value={coAuthors} onChange={e => setCoAuthors(e.target.value)} className="input-field" />
+          <input type="text" placeholder="共同投稿者の表示名（カンマ区切り。例: user1, user2）" value={coAuthors} onChange={e => setCoAuthors(e.target.value)} className="input-field" style={{ marginBottom: '0.5rem' }} />
+          {availableProfiles.length > 0 && (
+            <>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>追加できるユーザー:</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginBottom: '1rem' }}>
+                {availableProfiles
+                  .filter(p => p.display_name !== userName && !coAuthors.split(',').map(s=>s.trim()).includes(p.display_name))
+                  .filter(p => {
+                     const parts = coAuthors.split(',');
+                     const currentInput = parts[parts.length - 1].trim().toLowerCase();
+                     return currentInput ? p.display_name.toLowerCase().includes(currentInput) : true;
+                  })
+                  .map(p => (
+                  <button
+                    key={p.uid}
+                    type="button"
+                    onClick={() => {
+                      const parts = coAuthors.split(',');
+                      parts.pop(); // Remove the currently typed part
+                      const newCoAuthors = [...parts.map(s => s.trim()).filter(Boolean), p.display_name].join(', ');
+                      setCoAuthors(newCoAuthors ? newCoAuthors + ', ' : newCoAuthors);
+                    }}
+                    style={{ fontSize: '0.8rem', padding: '0.2rem 0.6rem', borderRadius: '12px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'inherit', cursor: 'pointer' }}
+                  >
+                    + {p.display_name}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
           <textarea placeholder="ガイドの内容（Markdown対応）" value={content} onChange={e => setContent(e.target.value)} required rows={15} className="input-field" />
           <p style={{ fontSize: '0.8rem', marginTop: '-0.5rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>※Markdown記法（# 見出し, * リスト, **太字** など）が使えます</p>
           <button type="submit" disabled={isSubmitting} className="btn btn-primary">
@@ -160,21 +207,35 @@ export default function Guides() {
       )}
 
       <div className="list-container">
-        {guides.length === 0 ? <p>ガイドはまだありません。</p> : guides.map(guide => (
+        {guides.length === 0 ? <p>ガイドはまだありません。</p> : guides.map(guide => {
+          const isExpanded = !!expandedGuides[guide.id];
+          const TRUNCATE_LENGTH = 150;
+          const needsTruncation = guide.content.length > TRUNCATE_LENGTH;
+          const displayContent = isExpanded || !needsTruncation ? guide.content : guide.content.slice(0, TRUNCATE_LENGTH) + '...';
+
+          return (
           <div key={guide.id} className="card glass-panel">
             <h2>{guide.title}</h2>
             <div className="meta" style={{ marginBottom: '1rem' }}>
               <AuthorBadge author={guide.poster || ''} date={guide.created_at} coAuthors={guide.co_authors} />
             </div>
             <div className="content" style={{ padding: '1rem 0' }}>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{guide.content}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayContent}</ReactMarkdown>
+              {needsTruncation && (
+                <button 
+                  onClick={() => setExpandedGuides(prev => ({ ...prev, [guide.id]: !isExpanded }))} 
+                  style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', padding: 0, marginTop: '0.5rem', fontWeight: 'bold' }}
+                >
+                  {isExpanded ? '▲ 折りたたむ' : '▼ 続きを読む'}
+                </button>
+              )}
             </div>
 
             <div className="timeline-actions">
               <button className={`btn btn-like ${localStorage.getItem(`liked_guides_${guide.id}`) ? 'liked' : ''}`} onClick={() => handleLike(guide.id)}>
                 <span className="icon">♥</span> {guide.likes || 0}
               </button>
-              {(!guide.poster || userName === guide.poster) && (
+              {canEdit(guide) && (
                 <>
                   <div className="spacer"></div>
                   <button className="btn btn-edit" onClick={() => handleEdit(guide)}>編集</button>
@@ -183,7 +244,7 @@ export default function Guides() {
               )}
             </div>
           </div>
-        ))}
+        )})}
       </div>
     </div>
   );

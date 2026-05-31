@@ -29,6 +29,7 @@ export default function Projects() {
 
   const [editId, setEditId] = useState<number | null>(null);
   const [error, setError] = useState('');
+  const [expandedItems, setExpandedItems] = useState<{[id: number]: boolean}>({});
 
   const fetchItems = async () => {
     try {
@@ -125,16 +126,28 @@ export default function Projects() {
     fetchItems();
   };
 
+  const canEdit = (item: ProjectItem) => {
+    if (!userName) return false;
+    if (!item.author || item.author === userName) return true;
+    if (item.co_authors && item.co_authors.split(',').map(s => s.trim()).includes(userName)) return true;
+    return false;
+  };
+
   const handleLike = async (id: number) => {
     const likedKey = `liked_project_${id}`;
-    if (localStorage.getItem(likedKey)) return;
+    const isLiked = !!localStorage.getItem(likedKey);
 
-    setItems(prev => prev.map(item => item.id === id ? { ...item, likes: (item.likes || 0) + 1 } : item));
-    localStorage.setItem(likedKey, 'true');
+    setItems(prev => prev.map(item => item.id === id ? { ...item, likes: Math.max(0, (item.likes || 0) + (isLiked ? -1 : 1)) } : item));
+    
+    if (isLiked) {
+      localStorage.removeItem(likedKey);
+    } else {
+      localStorage.setItem(likedKey, 'true');
+    }
 
     await fetch(`/api/projects/${id}`, {
       method: 'PUT',
-      body: JSON.stringify({ action: 'like' }),
+      body: JSON.stringify({ action: isLiked ? 'unlike' : 'like' }),
       headers: { 'Content-Type': 'application/json' }
     });
   };
@@ -208,7 +221,13 @@ export default function Projects() {
       )}
 
       <div className="timeline-feed">
-        {items.length === 0 ? <p className="empty-state">まだ企画がありません。</p> : items.map(item => (
+        {items.length === 0 ? <p className="empty-state">まだ企画がありません。</p> : items.map(item => {
+          const isExpanded = !!expandedItems[item.id];
+          const TRUNCATE_LENGTH = 100;
+          const needsTruncation = item.description.length > TRUNCATE_LENGTH;
+          const displayContent = isExpanded || !needsTruncation ? item.description : item.description.slice(0, TRUNCATE_LENGTH) + '...';
+
+          return (
           <div key={item.id} className="timeline-card glass-panel">
             <div className="timeline-header">
               <span className={`tag tag-${item.status}`}>
@@ -220,13 +239,23 @@ export default function Projects() {
             </div>
 
             <h2 className="timeline-title">{item.title}</h2>
-            <p className="timeline-desc">{item.description}</p>
+            <p className="timeline-desc">
+              {displayContent}
+              {needsTruncation && (
+                <button 
+                  onClick={() => setExpandedItems(prev => ({ ...prev, [item.id]: !isExpanded }))} 
+                  style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', padding: 0, display: 'block', marginTop: '0.5rem', fontWeight: 'bold' }}
+                >
+                  {isExpanded ? '▲ 折りたたむ' : '▼ 続きを読む'}
+                </button>
+              )}
+            </p>
 
             <div className="timeline-actions">
               <button className={`btn btn-like ${localStorage.getItem(`liked_project_${item.id}`) ? 'liked' : ''}`} onClick={() => handleLike(item.id)}>
                 <span className="icon">👍</span> {item.likes || 0}
               </button>
-              {userName === item.author && (
+              {canEdit(item) && (
                 <>
                   <div className="spacer"></div>
                   <button className="btn btn-edit" onClick={() => handleEdit(item)}>編集</button>
@@ -235,7 +264,7 @@ export default function Projects() {
               )}
             </div>
           </div>
-        ))}
+        )})}
       </div>
     </div>
   );

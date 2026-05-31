@@ -9,6 +9,8 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
 
   if (data.action === 'like') {
     await DB.prepare("UPDATE projects SET likes = likes + 1 WHERE id = ?").bind(id).run();
+  } else if (data.action === 'unlike') {
+    await DB.prepare("UPDATE projects SET likes = MAX(COALESCE(likes, 0) - 1, 0) WHERE id = ?").bind(id).run();
   } else if (data.action === 'edit') {
     await DB.prepare("UPDATE projects SET title = ?, description = ?, status = ?, co_authors = ? WHERE id = ?")
       .bind(data.title, data.description, data.status, data.co_authors || '', id)

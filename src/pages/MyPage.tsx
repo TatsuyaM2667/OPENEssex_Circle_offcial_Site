@@ -288,7 +288,7 @@ export default function MyPage() {
           </div>
 
           <div className="form-group">
-            <label>スキル・関心分野</label>
+            <label>スキル（資格やプログラミング言語など）</label>
             <input
               type="text"
               value={form.skills}

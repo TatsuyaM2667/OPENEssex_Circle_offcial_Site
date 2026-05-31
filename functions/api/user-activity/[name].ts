@@ -15,7 +15,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       UNION ALL
       SELECT id, title, 'books' as section, created_at FROM books WHERE poster = ? OR co_authors LIKE ?
       UNION ALL
-      SELECT id, title, 'timeline' as section, created_at FROM timeline WHERE author = ? OR co_authors LIKE ?
+      SELECT id, title, 'timeline' as section, created_at FROM timeline WHERE author = ?
       UNION ALL
       SELECT id, title, 'projects' as section, created_at FROM projects WHERE author = ? OR co_authors LIKE ?
       ORDER BY created_at DESC
@@ -25,7 +25,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         decodedName, `%${decodedName}%`,
         decodedName, `%${decodedName}%`,
         decodedName, `%${decodedName}%`,
-        decodedName, `%${decodedName}%`,
+        decodedName,
         decodedName, `%${decodedName}%`
       )
       .all();

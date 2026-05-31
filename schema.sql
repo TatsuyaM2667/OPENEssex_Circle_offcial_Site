@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS documents (
   title TEXT NOT NULL,
   content TEXT NOT NULL,
   author TEXT NOT NULL,
+  co_authors TEXT DEFAULT '',
   likes INTEGER DEFAULT 0,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -12,6 +13,9 @@ CREATE TABLE IF NOT EXISTS guides (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT NOT NULL,
   content TEXT NOT NULL,
+  category TEXT DEFAULT '一般',
+  poster TEXT DEFAULT 'Unknown',
+  co_authors TEXT DEFAULT '',
   likes INTEGER DEFAULT 0,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -22,6 +26,8 @@ CREATE TABLE IF NOT EXISTS books (
   description TEXT,
   author TEXT,
   link TEXT,
+  poster TEXT DEFAULT 'Unknown',
+  co_authors TEXT DEFAULT '',
   likes INTEGER DEFAULT 0,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -43,6 +49,7 @@ CREATE TABLE IF NOT EXISTS projects (
   description TEXT NOT NULL,
   author TEXT NOT NULL,
   status TEXT DEFAULT 'planning',
+  co_authors TEXT DEFAULT '',
   likes INTEGER DEFAULT 0,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
